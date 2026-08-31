@@ -1,64 +1,153 @@
 # ReadVice
 
-In today's digital era, where user reviews and personalized recommendations hold significant influence, we present an innovative project: an intelligent recommendation website. 
+> Find your next book.
 
-This platform aims to empower book readers by offering not only a comprehensive book search feature but also personalized book recommendations based on their predicted interests.
+ReadVice is a book discovery and recommendation website. It lets readers search an
+extensive book database, filter titles by genre, save books to a personal list,
+react to books they love, and leave comments — all wrapped in a social experience
+that helps like-minded readers connect around what they read.
 
-The project recognizes the immense value of book recommendations, as they allow readers to connect with others and share in their experiences.
+The dataset used in this project comes from
+[goodreads_bbe_dataset](https://github.com/scostap/goodreads_bbe_dataset/tree/main).
 
-Recommendations serve as invitations to explore new literary worlds, fostering a sense of community and providing meaningful topics for discussion.
+![Home page](https://github.com/DYagmur/ReadVice/assets/30656517/a39c82e6-9570-4037-a728-2f455bf44dc0)
+![Book page](https://github.com/DYagmur/ReadVice/assets/30656517/743cbc30-bd7a-4638-861f-5185223cd84b)
 
-The platform's search functionality provides users with effortless access to an extensive database of books. Users can explore and discover titles, authors, and genres of interest, 
+---
 
-ensuring a seamless book search experience.
+## Features
 
-The true strength of the system lies in its ability to go beyond simple search capabilities. 
+| Feature | Description |
+| --- | --- |
+| **Search** | Search books, authors or genres. |
+| **Filter** | Filter the catalogue by clicking a genre. |
+| **Like** | Rate a book positively with the *"I love this book"* button. |
+| **Add to list** | Save a book to a personal list shown on your profile. |
+| **Comments** | Leave comments on a book, displayed with username and date. |
+| **Pagination** | Book results are paginated for a cleaner browsing experience. |
+| **Contact** | Send an email through the contact form. |
 
-By leveraging user data, the system predicts books that are likely to captivate the user's interest, enhancing their reading journey by introducing them to new authors, 
+---
 
-genres, and literary treasures they may have otherwise missed.
+## Tech stack
 
-To foster interaction and engagement, the intelligent recommendation website incorporates social features. 
+- **PHP 8** (plain PHP, no framework, no Composer dependencies)
+- **MySQL / MariaDB** accessed through PDO (`pdo_mysql`)
+- **HTML + SCSS/CSS** (compiled stylesheet in `css/`)
 
-Users are encouraged to share their thoughts, reviews, and recommendations on books they have read. 
+### Project structure
 
-This facilitates meaningful discussions, connects like-minded readers, and cultivates a vibrant community of book enthusiasts.
+```
+readvice/
+├── index.php            # Home / catalogue
+├── login.php            # Login
+├── signup.php           # Registration
+├── logout.php
+├── bookInfo.php         # Single book page
+├── userList.php         # Current user's saved list
+├── about.php
+├── contact.php          # Contact form (uses PHP mail())
+├── css/                 # style.scss and compiled style.css
+├── img/
+└── inc/
+    ├── config.inc.php   # Database credentials
+    ├── Page.class.php / PageContent.class.php
+    ├── BookPage.class.php
+    ├── Entities/        # Book, User, UserComment, UserList
+    └── Utilities/
+        ├── PDOService.class.php
+        ├── LoginManager.class.php
+        ├── DAO/         # BookDAO, UserDAO, UserCommentDAO, UserListDAO
+        └── Repositories/BookRepository.class.php
+```
 
-Our project aims to revolutionize the way readers discover and connect with books. 
+---
 
-By combining cutting-edge algorithms, personalized recommendations, and a thriving community, the intelligent recommendation website promises 
+## Getting started
 
-an immersive and enriching reading experience that ignites a lifelong passion for literature.
+### Prerequisites
 
+- PHP **8.0 or newer** with the `pdo_mysql` extension enabled
+- MySQL or MariaDB (**XAMPP** bundles both, and its PHP already has `pdo_mysql`)
 
-In our project we have used this dataset https://github.com/scostap/goodreads_bbe_dataset/tree/main 
+### 1. Get the code
 
+```bash
+git clone https://github.com/pssgarcia/readvice.git
+cd readvice
+```
 
-Functionalities
+### 2. Create the database and import the data
 
-2.1 Search
-.User will be able to search the books, authors or genres he is interested in
+Start MySQL (e.g. from the XAMPP Control Panel), then:
 
-2.2	Filter 
-Users can also filter the page by showing the books based on the genre he clicks
+```bash
+# create the database
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS bookstest"
 
-2.3	Like
-The user will be able to rate the book positively, by simply clicking on “I love this book” button
+# import the schema and data
+mysql -u root bookstest < inc/data/bookstest.sql
+```
 
-2.4    Add to list
-User has the option to save the book to a personal list, which will be in the profile
+On Windows with XAMPP, use the bundled client:
 
-2.5    Add comments
-Users will be able to include comments to the book that display the username and the date
+```powershell
+& C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE IF NOT EXISTS bookstest"
+& C:\xampp\mysql\bin\mysql.exe -u root bookstest -e "source inc/data/bookstest.sql"
+```
 
-2.6	Pagination
-There is a pagination at the bottom of the page in order to distribute the books data in a smoother and cleaner way
+Alternatively, open **phpMyAdmin** (`http://localhost/phpmyadmin`), create a database
+named `bookstest`, and import `inc/data/bookstest.sql` from the *Import* tab.
 
-2.7	Send email
-Users will be able to send an email using contact form.
+### 3. Configure the connection
 
+Database credentials live in `inc/config.inc.php`. The defaults match a stock XAMPP
+install:
 
-![image](https://github.com/DYagmur/ReadVice/assets/30656517/a39c82e6-9570-4037-a728-2f455bf44dc0)
+```php
+define("DB_USER", "root");
+define("DB_PASS", "");
+define("DB_HOST", "localhost");
+define("DB_NAME", "bookstest");
+```
 
-![image](https://github.com/DYagmur/ReadVice/assets/30656517/743cbc30-bd7a-4638-861f-5185223cd84b)
+Adjust `DB_USER` / `DB_PASS` if your MySQL uses different credentials.
 
+### 4. Run the app
+
+**Option A — PHP built-in server (recommended for local dev)**
+
+Run from the project root. On Windows use the XAMPP PHP binary so `pdo_mysql` is
+available:
+
+```powershell
+# Windows / XAMPP
+& C:\xampp\php\php.exe -S localhost:8000
+```
+
+```bash
+# macOS / Linux (or if a suitable php is on your PATH)
+php -S localhost:8000
+```
+
+Then open **http://localhost:8000/index.php**.
+
+> XAMPP's PHP may print harmless `pdo_firebird` / `pdo_oci` warnings on startup —
+> ignore them. The server is up once you see
+> `PHP ... Development Server (http://localhost:8000) started`.
+
+**Option B — Apache (XAMPP htdocs)**
+
+Copy or symlink the project into `C:\xampp\htdocs\readvice`, start Apache and MySQL
+from the XAMPP Control Panel, and open **http://localhost/readvice/index.php**.
+
+---
+
+## Troubleshooting
+
+| Symptom | Cause / fix |
+| --- | --- |
+| `Fatal error: Call to a member function prepare() on null` in `PDOService.class.php` | The database connection failed and the error was swallowed. Check that MySQL is running, the `bookstest` database exists and is imported, and the credentials in `inc/config.inc.php` are correct. |
+| `could not find driver` | The PHP you are running doesn't have `pdo_mysql`. Use `C:\xampp\php\php.exe`, or enable `extension=pdo_mysql` (and `extension_dir = "ext"`) in your `php.ini`. |
+| Blank page / `This site can't be reached` | The dev server isn't running or is on another port. Re-run the command from step 4 and confirm the `Development Server ... started` line. |
+| Contact form doesn't send email | `contact.php` uses PHP's `mail()`, which needs a configured mail transport (SMTP / sendmail). It typically won't work on a bare local setup. |
